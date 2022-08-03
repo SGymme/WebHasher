@@ -12,3 +12,35 @@ body {
 body>div {
     width: 100%;
 }
+
+/* Loading Spinner */
+button {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+button:disabled {
+    height: 38px;
+}
+
+.loader {
+    width: 17px;
+    height: 17px;
+    border: 3px solid #FFF;
+    border-bottom-color: transparent;
+    border-radius: 50%;
+    display: inline-block;
+    box-sizing: border-box;
+    animation: rotation 1s linear infinite;
+}
+
+@keyframes rotation {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
