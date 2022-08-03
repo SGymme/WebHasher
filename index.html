@@ -12,6 +12,8 @@
 
     <!-- JavaScript -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-A3rJD856KowSb7dwlZdYEkO39Gagi7vIsF0jrRAoQmDKKtQBHUuLZ9AsSv4jD4Xa" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.4/FileSaver.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.4/jszip.min.js"></script>
     <script src="js/main.js" defer></script>
 </head>
 
@@ -33,7 +35,14 @@
                 <input class="form-control" type="file" accept=".js" id="formFileJS" multiple>
             </div>
             <hr>
-            <button class="btn btn-primary col-12" type="submit" id="submitButton">Hash</button>
+            <div class="d-flex justify-content-between" id="buttonContainer">
+                <button class="btn btn-primary" style="width: 100%; height: 44px" type="submit" id="submitButton">
+                    <svg width="20" height="20" fill="#FFFFFF" class="bi bi-play-fill" viewBox="0 0 16 16">
+                        <path d="m11.596 8.697-6.363 3.692c-.54.313-1.233-.066-1.233-.697V4.308c0-.63.692-1.01 1.233-.696l6.363 3.692a.802.802 0 0 1 0 1.393z" />
+                    </svg>
+                    &nbsp; Hash
+                </button>
+            </div>
         </form>
     </div>
 </body>

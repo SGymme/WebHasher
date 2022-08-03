@@ -1,8 +1,9 @@
+"use strict";
+
 // Variables -----------------------------------------------------
 const htmlFileInput = document.getElementById("formFileHTML");
 const cssFileInput = document.getElementById("formFileCSS");
 const jsFileInput = document.getElementById("formFileJS");
-const submitButton = document.getElementById("submitButton");
 
 let htmlFileContent;
 let cssFileContent = [];
@@ -16,12 +17,29 @@ async function hashFiles() {
     changeButton("DISABLE");
     await hashIDs();
     changeButton("ENABLE");
+
+    // Create download button
+    const submitButton = document.getElementById("submitButton");
+    const buttonContainer = document.getElementById("buttonContainer");
+    submitButton.style.width = "calc(100% - 60px)";
+    buttonContainer.innerHTML += `<button id="downloadButton" class="btn btn-secondary" style="width: 44px" type="button" onclick="downloadZIP()"><svg viewBox="0 0 24 24" width="30" height="30" fill="#FFFFFF"><path d="M9.878,18.122a3,3,0,0,0,4.244,0l3.211-3.211A1,1,0,0,0,15.919,13.5l-2.926,2.927L13,1a1,1,0,0,0-1-1h0a1,1,0,0,0-1,1l-.009,15.408L8.081,13.5a1,1,0,0,0-1.414,1.415Z" /><path d="M23,16h0a1,1,0,0,0-1,1v4a1,1,0,0,1-1,1H3a1,1,0,0,1-1-1V17a1,1,0,0,0-1-1H1a1,1,0,0,0-1,1v4a3,3,0,0,0,3,3H21a3,3,0,0,0,3-3V17A1,1,0,0,0,23,16Z" /></svg></button>`
 }
 
 /**
  * Hashes all id's from the HTML file and replaces them in the css/js files
  */
 async function hashIDs() {
+    const submitButton = document.getElementById("submitButton");
+    const buttonContainer = document.getElementById("buttonContainer");
+
+    // Remove download button
+    submitButton.style.width = "100%";
+    submitButton.style.height = "44px";
+
+    if (buttonContainer.children.length > 1) {
+        buttonContainer.children[1].remove();
+    }
+
     // Get all the content of the files
     await readFiles();
 
@@ -29,16 +47,38 @@ async function hashIDs() {
     let hashedContent = await findIDs(htmlFileInput.files);
 
     // Replace all id's in HTML file
-    const htmlContent = await replaceIDs(hashedContent, "HTML");
-    console.log(htmlContent + "\n\n\n");
+    await replaceIDs(hashedContent, "HTML");
 
     // Replace all id's in CSS files
-    const cssContent = await replaceIDs(hashedContent, "CSS");
-    console.log(cssContent + "\n\n\n");
+    await replaceIDs(hashedContent, "CSS");
 
     // Replace all id's in JS files
-    const jsContent = await replaceIDs(hashedContent, "JS");
-    console.log(jsContent + "\n\n\n")
+    await replaceIDs(hashedContent, "JS");
+}
+
+/**
+ * Downloads the zip file with the hashed files in it
+ */
+function downloadZIP() {
+    let zip = new JSZip();
+
+    // HTML file
+    zip.file(htmlFileInput.files[0].name, htmlFileContent);
+
+    // CSS files
+    for (let i = 0; i < cssFileInput.files.length; i++) {
+        zip.file(cssFileInput.files[i].name, cssFileContent[i]);
+    }
+
+    // JS files
+    for (let i = 0; i < jsFileInput.files.length; i++) {
+        zip.file(jsFileInput.files[i].name, jsFileContent[i]);
+    }
+
+    zip.generateAsync({ type: "blob" })
+        .then(function (content) {
+            saveAs(content, "HashedFiles.zip");
+        });
 }
 
 /**
@@ -107,6 +147,8 @@ async function replaceIDs(hashedContent, fileType) {
             for (let s = 0; s < hashedContent.length; s++) {
                 fileContent = fileContent.replaceAll(`#${hashedContent[s][0]}`, `#${hashedContent[s][1]}`);
             }
+
+            cssFileContent[i] = fileContent;
         }
     } else if (fileType === "JS") {
         files = jsFileInput.files;
@@ -123,6 +165,8 @@ async function replaceIDs(hashedContent, fileType) {
                     fileContent = fileContent.replaceAll(`getElementById(${currentID}`, `getElementById(${replaceID}`);
                 }
             }
+
+            jsFileContent[i] = fileContent;
         }
     } else {
         fileContent = htmlFileContent;
@@ -131,6 +175,8 @@ async function replaceIDs(hashedContent, fileType) {
         for (let s = 0; s < hashedContent.length; s++) {
             fileContent = fileContent.replaceAll(`id="${hashedContent[s][0]}"`, `id="${hashedContent[s][1]}"`);
         }
+
+        htmlFileContent = fileContent;
     }
     return fileContent;
 }
@@ -141,6 +187,9 @@ async function replaceIDs(hashedContent, fileType) {
  * @param {*} state 
  */
 function changeButton(state) {
+    const submitButton = document.getElementById("submitButton");
+    const buttonContainer = document.getElementById("buttonContainer");
+
     switch (state) {
         case "DISABLE":
             [htmlFileInput, cssFileInput, jsFileInput, submitButton].forEach((e) => e.disabled = true);
@@ -150,7 +199,7 @@ function changeButton(state) {
         case "ENABLE":
             [htmlFileInput, cssFileInput, jsFileInput, submitButton].forEach((e) => e.disabled = false);
             submitButton.classList.replace("btn-secondary", "btn-primary");
-            submitButton.innerHTML = "Hash";
+            submitButton.innerHTML = `<svg width="20" height="20" fill="#FFFFFF" class="bi bi-play-fill" viewBox="0 0 16 16"><path d="m11.596 8.697-6.363 3.692c-.54.313-1.233-.066-1.233-.697V4.308c0-.63.692-1.01 1.233-.696l6.363 3.692a.802.802 0 0 1 0 1.393z" /></svg>&nbsp; Hash`;
             break;
     }
 }
