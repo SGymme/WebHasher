@@ -74,13 +74,19 @@ function downloadZIP() {
     zip.file(htmlFileInput.files[0].name, htmlFileContent);
 
     // CSS files
-    for (let i = 0; i < cssFileInput.files.length; i++) {
-        zip.file(cssFileInput.files[i].name, cssFileContent[i]);
+    if (cssFileInput.files.length > 0) {
+        let cssFolder = zip.folder("css");
+        for (let i = 0; i < cssFileInput.files.length; i++) {
+            cssFolder.file(cssFileInput.files[i].name, cssFileContent[i]);
+        }
     }
 
     // JS files
-    for (let i = 0; i < jsFileInput.files.length; i++) {
-        zip.file(jsFileInput.files[i].name, jsFileContent[i]);
+    if (jsFileInput.files.length > 0) {
+        let jsFolder = zip.folder("js");
+        for (let i = 0; i < jsFileInput.files.length; i++) {
+            jsFolder.file(jsFileInput.files[i].name, jsFileContent[i]);
+        }
     }
 
     zip.generateAsync({ type: "blob" })
